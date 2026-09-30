@@ -11,3 +11,16 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+
+@font-face {
+  font-family: Cairo;
+  src: url("/public/fonts/Cairo-Medium.ttf");
+  font-weight: medium;
+}
+
+@font-face {
+  font-family: Cairo;
+  src: url("/public/fonts/Cairo-Bold.ttf");
+  font-weight: 800;
+}
