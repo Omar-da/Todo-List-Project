@@ -2,6 +2,10 @@
 
 A simple and clean React to-do application built with Create React App, Material UI, and localStorage persistence.
 
+## Project Link
+
+[View the project](https://www.linkedin.com/safety/go/?url=https%3A%2F%2Flnkd.in%2FeisJkxdH&urlhash=lyiL&mt=whB8BJ2e88M8_n5DGu63NUp-q8VGc2Blp6L2nEF-yP1Hda2uOZcSVIQzHoxpqQJJAuqMPVZgHnpdZqIZbdHkEwjEmz1SjDFtZelxhWXLXm7-IU9KJMBZa0r5j1I&isSdui=true&lipi=urn%3Ali%3Apage%3Ad_flagship3_profile_view_base%3BiIBS3Y3gSV2q%2FXAlgwwywA%3D%3D)
+
 ## Features
 
 - Add new tasks
