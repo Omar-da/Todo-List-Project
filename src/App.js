@@ -2,6 +2,7 @@ import logo from './logo.svg';
 import './App.css';
 import MainContainer from './components/MainContainer';
 import { createTheme, ThemeProvider } from '@mui/material';
+import ToastProvider from './contexts/ToastContext';
 
 function App() {
   const theme = createTheme({
@@ -14,11 +15,14 @@ function App() {
       }
     }
   })
+  
   return (
     <ThemeProvider theme={theme}>
-      <div className="App" style={{height: "100vh", display: "flex", alignItems: "center", direction: "rtl"}}>
-        <MainContainer/>
-      </div>
+      <ToastProvider>
+        <div className="App" style={{height: "100vh", display: "flex", alignItems: "center", direction: "rtl"}}>
+          <MainContainer/>
+        </div>
+      </ToastProvider>
     </ThemeProvider>
   );
 }

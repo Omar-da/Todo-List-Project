@@ -1,72 +1,51 @@
-import { Box, Button, Card, CardActions, CardContent, Divider, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
-import ToDo from "./ToDo";
+import { Card, CardActions, CardContent, Divider, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import ToDoList from "./ToDoList";
 import InputSection from "./InputSection";
-import { useEffect, useState } from "react";
-import { v4 as uuid } from 'uuid';
+import { useMemo, useReducer, useState } from "react";
 import { TodoActionsContext } from "../contexts/TodoActionsContext";
+import { useToast } from "../contexts/ToastContext";
+import TodosReducer from "../reducers/TodosReducer";
 
 
 export default function ToDoBox() {
-  const [todos, setTodos] = useState(([
-    {
-            id: uuid(),
-            title: "دراسة كورس react",
-            description: "task description",
-            isComplete: false
-        },
-        {
-            id: uuid(),
-            title: "تصوير حلقة DLL",
-            description: "task description",
-            isComplete: false
-        },
-        {
-            id: uuid(),
-            title: "إكمال تطبيق المعلم",
-            description: "task description",
-            isComplete: false
-          },
-  ]))
+  // const [todos, setTodos] = useState(() => {
+  //   const localStorageTodos = JSON.parse(localStorage.getItem("todos"))
+  //   if(localStorageTodos)
+  //     return localStorageTodos
+  //   return []
+  // })
 
-  useEffect(() => {
+  const [todos, todosDispatch] = useReducer(
+    TodosReducer,
+    undefined,
+    () => {
     const localStorageTodos = JSON.parse(localStorage.getItem("todos"))
     if(localStorageTodos)
-      setTodos(localStorageTodos)
-  }, [])
-  
-
+      return localStorageTodos
+    return []
+  }
+  );
   const [filter, setFilter] = useState("all")
+  const createToast = useToast()
 
   function addTask(todo) {
-    setTodos([...todos, todo])
-    localStorage.setItem('todos', JSON.stringify(todos))
+    todosDispatch({ type: "add", payload: todo})
+    createToast("تم إضافة مهمة جديدة")
   }
   
   const achieveTodo = (id) => {
-    const updatedTodos = todos.map((todo) =>
-      todo.id === id ? { ...todo, isComplete: !todo.isComplete } : todo
-    );
-
-    setTodos(updatedTodos);
-    localStorage.setItem('todos', JSON.stringify(updatedTodos))
-
+    todosDispatch({type: "achieve", payload: id})
+    createToast("تم تعديل حالة المهمة")
   };
 
   const deleteTodo = (id) => {
-    const  updatedTodos = todos.filter((todo) =>
-        todo.id !== id  
-      )
-    setTodos(updatedTodos);
-    localStorage.setItem('todos', JSON.stringify(updatedTodos))
+    todosDispatch({type: "delete", payload: id})
+    createToast("تم حذف المهمة")
   }
 
-  const updateTodo = ({ id, title, description }) => {
-    const updatedTodos = todos.map((todo) =>
-        todo.id === id ? { ...todo, title: title, description: description } : todo
-      )
-    setTodos(updatedTodos);
-    localStorage.setItem('todos', JSON.stringify(updatedTodos))
+  const updateTodo = (updatedValues) => {
+    todosDispatch({type: "update", payload: updatedValues})
+    createToast("تم تعديل المهمة")
   }
 
   const handleFilter = (e) => {
@@ -74,18 +53,27 @@ export default function ToDoBox() {
     setFilter(newFilter)
   }
 
-  let filteredTodos = [...todos];
-    switch (filter) {
-      case "achieved":
-        filteredTodos = todos.filter((todo) => todo.isComplete)
-        break;
-      case "notAchieved":
-        filteredTodos = todos.filter((todo) => !todo.isComplete)
-        break;
-    }
-    
-    return (
-    <Card style={{height: "90vh", overflow: "scroll", scrollbarWidth: "none"}}>
+  const achieveTodos = useMemo(() => {
+    return todos.filter((todo) => todo.isComplete)
+  }, [todos]),
+    notAchievedTodos = useMemo(() => {
+      return todos.filter((todo) => !todo.isComplete) 
+  }, [todos])
+
+  let filteredTodos = []
+  switch (filter) {
+    case "achieved":
+      filteredTodos = achieveTodos
+      break;
+    case "notAchieved":
+      filteredTodos = notAchievedTodos
+      break;
+    default:
+      filteredTodos = todos
+  }
+
+  return (
+    <Card style={{maxHeight: "90vh", overflow: "scroll", scrollbarWidth: "none"}}>
       <CardContent style={{display: "flex", flexDirection:"column", gap: "30px", alignItems: "center"}}>
         <Typography variant="h2">مهامي</Typography>
         <Divider style={{width: "100%"}}/>
@@ -96,7 +84,7 @@ export default function ToDoBox() {
           </ToggleButtonGroup>
         
           <TodoActionsContext.Provider value={[achieveTodo, deleteTodo, updateTodo]}>
-            <ToDoList todos={filteredTodos} />
+          <ToDoList todos={filteredTodos} updateFunction={updateTodo} deleteFunction={deleteTodo} />
           </TodoActionsContext.Provider>
           
       </CardContent>
